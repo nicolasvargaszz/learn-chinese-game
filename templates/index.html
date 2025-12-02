@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>華語學習 | Chinese Learning Adventure</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        // Ink & Paper Theme
+                        ink: '#1a1a2e',
+                        'ink-light': '#2d2d44',
+                        paper: '#faf8f5',
+                        'paper-warm': '#f5f0e6',
+                        'paper-aged': '#ebe3d5',
+                        'paper-dark': '#e8dcc8',
+                        // Accent colors
+                        vermillion: '#d1462f',
+                        cinnabar: '#e85d4c',
+                        jade: '#4a8c7b',
+                        'jade-light': '#6aab9c',
+                        gold: '#c9a227',
+                        'gold-warm': '#ddb84d',
+                        bamboo: '#7a8b6e',
+                        // Legacy mappings
+                        primary: '#d1462f',
+                        accent: '#4a8c7b',
+                        'accent-alt': '#c9a227',
+                        success: '#4a8c7b',
+                        dark: '#faf8f5',
+                        'dark-lighter': '#f5f0e6',
+                        'dark-card': '#ebe3d5'
+                    },
+                    fontFamily: {
+                        'chinese': ['Noto Sans TC', 'sans-serif'],
+                        'display': ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="bg-paper text-ink font-display min-h-screen">
+    
+    <!-- Animated Background -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none z-0">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+        <div class="stars"></div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 right-0 z-50 bg-paper/90 backdrop-blur-xl border-b border-paper-dark shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center gap-3 cursor-pointer" id="nav-logo">
+                    <span class="text-3xl">🏮</span>
+                    <span class="text-xl font-bold bg-gradient-to-r from-vermillion to-gold bg-clip-text text-transparent">
+                        華語學習
+                    </span>
+                    <span class="text-2xl" title="Taiwan">🇹🇼</span>
+                </div>
+                <div class="hidden md:flex items-center gap-8">
+                    <a href="#" data-nav="home" class="nav-link text-vermillion hover:text-cinnabar transition-colors font-semibold">🏠 Home</a>
+                    <a href="#" data-nav="flashcards" class="nav-link text-vermillion hover:text-cinnabar transition-colors font-semibold">🃏 Flashcards</a>
+                    <a href="#" data-nav="lessons" class="nav-link text-vermillion hover:text-cinnabar transition-colors font-semibold">📖 Lessons</a>
+                </div>
+                <div class="flex items-center gap-4">
+                    <span class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-vermillion/10 text-vermillion text-sm font-medium border border-vermillion/20">
+                        <span>🔥</span>
+                        <span id="nav-streak">0</span> Streak
+                    </span>
+                    <button id="sound-toggle" class="p-2 rounded-lg bg-paper-aged hover:bg-paper-dark transition-colors border border-paper-dark" title="Toggle Sound">
+                        🔊
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="relative z-10 pt-16">
+        
+        <!-- ==================== HOME SECTION ==================== -->
+        <section id="home" class="section-page min-h-screen flex items-center justify-center px-4 py-20">
+            <div class="max-w-6xl mx-auto text-center">
+                <div class="mb-8 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-vermillion/10 border border-vermillion/30 text-vermillion text-sm font-medium">
+                    <span class="animate-pulse">✨</span>
+                    <span>{{ total_words }} Traditional Chinese Words</span>
+                </div>
+                
+                <h1 class="text-5xl md:text-7xl lg:text-8xl font-black mb-6 leading-tight">
+                    <span class="block text-ink">Master 🐉</span>
+                    <span class="block bg-gradient-to-r from-vermillion via-gold to-jade bg-clip-text text-transparent">
+                        Traditional Chinese 🇹🇼
+                    </span>
+                </h1>
+                
+                <p class="text-xl md:text-2xl text-ink-light/70 max-w-2xl mx-auto mb-12">
+                    🎋 Interactive flashcards, quizzes, and games designed to help you learn 
+                    <span class="text-vermillion font-semibold">華語</span> the elegant way 🧧
+                </p>
+                
+                <div class="flex flex-col sm:flex-row gap-4 justify-center mb-16">
+                    <button id="start-flashcards" class="group px-8 py-4 rounded-2xl bg-gradient-to-r from-vermillion to-cinnabar text-white font-bold text-lg transition-all hover:scale-105 hover:shadow-2xl hover:shadow-vermillion/20">
+                        <span class="flex items-center justify-center gap-2">
+                            📚 Start Flashcards
+                            <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+                            </svg>
+                        </span>
+                    </button>
+                    <button id="start-quiz" class="px-8 py-4 rounded-2xl bg-paper-aged border-2 border-paper-dark text-ink font-bold text-lg transition-all hover:bg-paper-dark hover:scale-105 hover:shadow-lg">
+                        🎮 Take Quiz
+                    </button>
+                </div>
+                
+                <!-- Study Mode Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+                    <div class="study-mode-card p-6 rounded-2xl bg-paper-warm border-2 border-paper-dark backdrop-blur-sm hover:border-vermillion/50 transition-all cursor-pointer" data-mode="flashcards">
+                        <div class="text-4xl mb-4">🃏🀄</div>
+                        <h3 class="text-xl font-bold mb-2 text-ink">Flashcards</h3>
+                        <p class="text-ink-light/70 text-sm">Flip through cards to memorize vocabulary with spaced repetition.</p>
+                    </div>
+                    <div class="study-mode-card p-6 rounded-2xl bg-paper-warm border-2 border-paper-dark backdrop-blur-sm hover:border-jade/50 transition-all cursor-pointer" data-mode="quiz">
+                        <div class="text-4xl mb-4">🎯🏮</div>
+                        <h3 class="text-xl font-bold mb-2 text-ink">Quiz Mode</h3>
+                        <p class="text-ink-light/70 text-sm">Test your knowledge with timed multiple choice questions.</p>
+                    </div>
+                    <div class="study-mode-card p-6 rounded-2xl bg-paper-warm border-2 border-paper-dark backdrop-blur-sm hover:border-gold/50 transition-all cursor-pointer" data-mode="lessons">
+                        <div class="text-4xl mb-4">📖🎋</div>
+                        <h3 class="text-xl font-bold mb-2 text-ink">Browse Lessons</h3>
+                        <p class="text-ink-light/70 text-sm">Explore vocabulary organized by lesson chapters.</p>
+                    </div>
+                </div>
+                
+                <!-- Stats Preview -->
+                <div class="mt-16 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-2xl mx-auto">
+                    <div class="p-4 rounded-xl bg-paper-warm border-2 border-paper-dark">
+                        <p class="text-3xl font-black text-vermillion">{{ total_words }}</p>
+                        <p class="text-sm text-ink-light/70">Total Words</p>
+                    </div>
+                    <div class="p-4 rounded-xl bg-paper-warm border-2 border-paper-dark">
+                        <p class="text-3xl font-black text-jade">{{ lessons|length }}</p>
+                        <p class="text-sm text-ink-light/70">Lessons</p>
+                    </div>
+                    <div class="p-4 rounded-xl bg-paper-warm border-2 border-paper-dark">
+                        <p class="text-3xl font-black text-gold" id="words-learned">0</p>
+                        <p class="text-sm text-ink-light/70">Learned</p>
+                    </div>
+                    <div class="p-4 rounded-xl bg-paper-warm border-2 border-paper-dark">
+                        <p class="text-3xl font-black text-bamboo" id="best-streak">0</p>
+                        <p class="text-sm text-ink-light/70">Best Streak</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== FLASHCARD SECTION ==================== -->
+        <section id="flashcards" class="section-page min-h-screen px-4 py-20 hidden">
+            <div class="max-w-4xl mx-auto">
+                
+                <!-- Flashcard Header -->
+                <div class="flex flex-col sm:flex-row items-center justify-between gap-4 mb-8">
+                    <div class="flex items-center gap-4">
+                        <button id="fc-back-to-home" class="p-2 rounded-lg bg-paper-aged hover:bg-paper-dark transition-colors border border-paper-dark">
+                            <svg class="w-6 h-6 text-ink" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                            </svg>
+                        </button>
+                        <h2 class="text-2xl font-bold text-ink">📚 Flashcards</h2>
+                    </div>
+                    
+                    <!-- Lesson Filter -->
+                    <div class="flex items-center gap-3">
+                        <label class="text-ink-light/70 text-sm">Lesson:</label>
+                        <select id="fc-lesson-filter" class="px-4 py-2 rounded-lg bg-paper-warm border-2 border-paper-dark text-ink focus:border-vermillion outline-none transition-colors cursor-pointer">
+                            <option value="all">All Lessons</option>
+                            {% for lesson in lessons %}
+                            <option value="{{ lesson }}">Lesson {{ lesson }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- Progress Bar -->
+                <div class="mb-8">
+                    <div class="flex justify-between text-sm text-ink-light/70 mb-2">
+                        <span>Progress</span>
+                        <span id="fc-progress-text">1 / {{ total_words }}</span>
+                    </div>
+                    <div class="h-3 bg-paper-dark rounded-full overflow-hidden">
+                        <div id="fc-progress-bar" class="h-full bg-gradient-to-r from-vermillion to-gold rounded-full transition-all duration-500" style="width: 0%"></div>
+                    </div>
+                </div>
+                
+                <!-- Flashcard Container - Quizlet Style Flip -->
+                <div class="flashcard-container mb-8" style="perspective: 1500px;">
+                    <div id="flashcard" class="flashcard-3d relative w-full cursor-pointer" style="min-height: 400px; transform-style: preserve-3d; transition: transform 0.8s cubic-bezier(0.4, 0.0, 0.2, 1);">
+                        
+                        <!-- Front of Card (Chinese Character) -->
+                        <div class="flashcard-face flashcard-front absolute inset-0 rounded-2xl bg-paper-warm border-3 border-paper-dark flex flex-col items-center justify-center p-8 shadow-lg" style="backface-visibility: hidden;">
+                            <div class="absolute top-4 left-4 px-3 py-1 rounded-full bg-jade/15 text-jade text-sm font-medium border border-jade/30" id="fc-category">
+                                📚 Category
+                            </div>
+                            <div class="absolute top-4 right-4 px-3 py-1 rounded-full bg-vermillion/15 text-vermillion text-sm font-medium border border-vermillion/30" id="fc-lesson">
+                                Lesson 7
+                            </div>
+                            
+                            <div class="absolute top-4 left-1/2 -translate-x-1/2">
+                                <span class="text-ink-light/40 text-sm">Click to flip</span>
+                            </div>
+                            
+                            <div id="fc-chinese" class="font-chinese text-8xl md:text-9xl font-black text-ink mb-4 text-center chinese-glow select-none">
+                                中文
+                            </div>
+                            
+                            <div id="fc-pos" class="px-4 py-1 rounded-full bg-paper-dark text-ink-light text-sm border border-ink/10">
+                                (N) Noun
+                            </div>
+                            
+                            <div class="absolute bottom-6 flex items-center gap-2 text-ink-light/40">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                                </svg>
+                                <span class="text-sm">Tap anywhere to reveal</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Back of Card (English + Pinyin) -->
+                        <div class="flashcard-face flashcard-back absolute inset-0 rounded-2xl bg-gradient-to-br from-paper-warm via-paper-aged to-paper-warm border-3 border-jade/40 flex flex-col items-center justify-center p-8 shadow-lg" style="backface-visibility: hidden; transform: rotateY(180deg);">
+                            <div class="absolute top-4 left-4 px-3 py-1 rounded-full bg-jade/15 text-jade text-sm font-medium border border-jade/30">
+                                ✓ Answer
+                            </div>
+                            
+                            <div id="fc-pinyin-back" class="text-3xl md:text-4xl text-jade font-bold mb-6">
+                                pīnyīn
+                            </div>
+                            
+                            <div id="fc-english-back" class="text-4xl md:text-6xl font-black text-ink mb-6 text-center">
+                                English Meaning
+                            </div>
+                            
+                            <div id="fc-hint-back" class="text-lg text-ink-light/60 text-center max-w-md mb-6">
+                                💡 Hint or additional context
+                            </div>
+                            
+                            <div class="absolute bottom-6 flex items-center gap-2 text-ink-light/40">
+                                <span class="text-sm">Click to flip back</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Flashcard Controls -->
+                <div class="flex items-center justify-center gap-4 mb-8">
+                    <button id="fc-prev" class="p-4 rounded-2xl bg-paper-aged hover:bg-paper-dark transition-all hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed border-2 border-paper-dark">
+                        <svg class="w-8 h-8 text-ink" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                        </svg>
+                    </button>
+                    
+                    <button id="fc-flip" class="px-8 py-4 rounded-2xl bg-gradient-to-r from-vermillion to-cinnabar text-white font-bold text-lg transition-all hover:scale-105 hover:shadow-xl hover:shadow-vermillion/20">
+                        🔄 Flip Card
+                    </button>
+                    
+                    <button id="fc-next" class="p-4 rounded-2xl bg-paper-aged hover:bg-paper-dark transition-all hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed border-2 border-paper-dark">
+                        <svg class="w-8 h-8 text-ink" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                        </svg>
+                    </button>
+                </div>
+                
+                <!-- Knowledge Rating -->
+                <div class="flex flex-col items-center gap-4">
+                    <p class="text-ink-light/70">How well did you know this?</p>
+                    <div class="flex flex-wrap justify-center gap-3">
+                        <button class="knowledge-btn px-6 py-3 rounded-xl bg-cinnabar/15 text-cinnabar font-medium hover:bg-cinnabar/25 hover:scale-105 transition-all border-2 border-cinnabar/30" data-level="1">
+                            😕 Learning
+                        </button>
+                        <button class="knowledge-btn px-6 py-3 rounded-xl bg-gold/15 text-gold font-medium hover:bg-gold/25 hover:scale-105 transition-all border-2 border-gold/30" data-level="2">
+                            🤔 Almost
+                        </button>
+                        <button class="knowledge-btn px-6 py-3 rounded-xl bg-jade/15 text-jade font-medium hover:bg-jade/25 hover:scale-105 transition-all border-2 border-jade/30" data-level="3">
+                            😎 Got it!
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Keyboard Shortcuts -->
+                <div class="mt-8 text-center text-ink-light/50 text-sm">
+                    <p>⌨️ Keyboard: <kbd class="px-2 py-1 rounded bg-paper-aged mx-1 border border-paper-dark">Space</kbd> to flip, <kbd class="px-2 py-1 rounded bg-paper-aged mx-1 border border-paper-dark">←</kbd> <kbd class="px-2 py-1 rounded bg-paper-aged mx-1 border border-paper-dark">→</kbd> to navigate</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== QUIZ SECTION ==================== -->
+        <section id="quiz" class="section-page min-h-screen px-4 py-20 hidden">
+            <div class="max-w-5xl mx-auto">
+                
+                <!-- Quiz Header -->
+                <div class="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6">
+                    <div class="flex items-center gap-4">
+                        <button id="quiz-back-to-home" class="p-2 rounded-lg bg-paper-aged hover:bg-paper-dark transition-colors border border-paper-dark">
+                            <svg class="w-6 h-6 text-ink" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                            </svg>
+                        </button>
+                        <h2 class="text-2xl font-bold text-ink">🎮 Quiz Challenge</h2>
+                        
+                        <!-- Quiz Lesson Filter -->
+                        <select id="quiz-lesson-filter" class="px-3 py-2 rounded-lg bg-paper-aged border-2 border-paper-dark text-ink font-medium text-sm focus:border-vermillion focus:outline-none transition-all cursor-pointer">
+                            <option value="all">📚 All Lessons</option>
+                            <option value="7">Lesson 7</option>
+                            <option value="8">Lesson 8</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Quiz Type Selector -->
+                    <div class="flex items-center gap-2 p-1.5 rounded-xl bg-paper-aged border border-paper-dark">
+                        <button class="quiz-type-btn px-4 py-2 rounded-lg bg-vermillion/15 text-vermillion text-sm font-medium transition-all" data-type="chinese-to-english">
+                            中文 → EN
+                        </button>
+                        <button class="quiz-type-btn px-4 py-2 rounded-lg text-ink-light text-sm font-medium hover:bg-paper-dark transition-all" data-type="english-to-chinese">
+                            EN → 中文
+                        </button>
+                        <button class="quiz-type-btn px-4 py-2 rounded-lg text-ink-light text-sm font-medium hover:bg-paper-dark transition-all" data-type="pinyin-to-chinese">
+                            Pīnyīn → 中文
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Stats Bar -->
+                <div class="grid grid-cols-4 gap-3 mb-6">
+                    <div class="stat-card p-3 rounded-xl bg-paper-warm border-2 border-gold/30 text-center">
+                        <div class="flex items-center justify-center gap-2">
+                            <span class="text-2xl">⭐</span>
+                            <span id="quiz-score" class="text-2xl font-black text-gold">0</span>
+                        </div>
+                        <p class="text-xs text-ink-light/60 mt-1">Score</p>
+                    </div>
+                    <div class="stat-card p-3 rounded-xl bg-paper-warm border-2 border-vermillion/30 text-center">
+                        <div class="flex items-center justify-center gap-2">
+                            <span class="text-2xl" id="streak-fire">🔥</span>
+                            <span id="quiz-streak" class="text-2xl font-black text-vermillion">0</span>
+                        </div>
+                        <p class="text-xs text-ink-light/60 mt-1">Streak</p>
+                    </div>
+                    <div class="stat-card p-3 rounded-xl bg-paper-warm border-2 border-jade/30 text-center">
+                        <div class="flex items-center justify-center gap-2">
+                            <span class="text-2xl">✅</span>
+                            <span id="quiz-correct" class="text-2xl font-black text-jade">0</span>
+                        </div>
+                        <p class="text-xs text-ink-light/60 mt-1">Correct</p>
+                    </div>
+                    <div class="stat-card p-3 rounded-xl bg-paper-warm border-2 border-ink/20 text-center relative">
+                        <div class="relative w-12 h-12 mx-auto">
+                            <svg class="w-full h-full -rotate-90">
+                                <circle cx="24" cy="24" r="20" fill="none" stroke="#e8dcc8" stroke-width="4"></circle>
+                                <circle id="quiz-timer-ring" cx="24" cy="24" r="20" fill="none" stroke="url(#timer-gradient)" stroke-width="4" stroke-linecap="round" stroke-dasharray="125.6" stroke-dashoffset="0"></circle>
+                                <defs>
+                                    <linearGradient id="timer-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                        <stop offset="0%" stop-color="#d1462f"/>
+                                        <stop offset="100%" stop-color="#c9a227"/>
+                                    </linearGradient>
+                                </defs>
+                            </svg>
+                            <span id="quiz-timer" class="absolute inset-0 flex items-center justify-center text-lg font-bold text-ink">15</span>
+                        </div>
+                        <p class="text-xs text-ink-light/60 mt-1">Time</p>
+                    </div>
+                </div>
+                
+                <!-- Round Progress -->
+                <div class="mb-6">
+                    <div class="flex justify-between text-sm text-ink-light/70 mb-2">
+                        <span>Round <span id="quiz-current-round" class="text-vermillion font-bold">1</span></span>
+                        <span id="quiz-round-text">1 / 12</span>
+                    </div>
+                    <div class="h-3 bg-paper-dark rounded-full overflow-hidden">
+                        <div id="quiz-progress-bar" class="h-full bg-gradient-to-r from-vermillion via-gold to-jade rounded-full transition-all duration-500 relative" style="width: 0%">
+                            <div class="absolute inset-0 bg-white/20 animate-pulse"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Quiz Question Card -->
+                <div class="quiz-card rounded-2xl bg-paper-warm border-3 border-paper-dark p-8 mb-6 relative overflow-hidden shadow-lg">
+                    <!-- Decorative elements -->
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-vermillion/5 rounded-full blur-3xl"></div>
+                    <div class="absolute bottom-0 left-0 w-32 h-32 bg-jade/5 rounded-full blur-3xl"></div>
+                    <div id="quiz-particles" class="absolute inset-0 pointer-events-none z-0"></div>
+                    
+                    <div class="relative z-10">
+                        <div class="flex items-center justify-center gap-3 mb-4">
+                            <span id="quiz-category" class="px-4 py-1.5 rounded-full bg-jade/10 text-jade text-sm font-medium border border-jade/30">📚 Category</span>
+                            <span id="quiz-lesson-badge" class="px-4 py-1.5 rounded-full bg-vermillion/10 text-vermillion text-sm font-medium border border-vermillion/30">Lesson 7</span>
+                            <span id="quiz-pos-badge" class="px-4 py-1.5 rounded-full bg-gold/10 text-gold text-sm font-medium border border-gold/30">(N)</span>
+                        </div>
+                        
+                        <p id="quiz-prompt" class="text-center text-ink-light/70 mb-3 text-lg">What is the Chinese character for:</p>
+                        
+                        <h3 id="quiz-question" class="text-5xl md:text-6xl lg:text-7xl font-black text-center text-ink mb-4 chinese-glow">
+                            English Word
+                        </h3>
+                        
+                        <div class="flex items-center justify-center gap-4 mt-4">
+                            <button id="quiz-hint-btn" class="px-4 py-2 rounded-xl bg-paper-aged border-2 border-paper-dark text-ink-light text-sm hover:bg-paper-dark hover:text-ink transition-all flex items-center gap-2">
+                                💡 Show Hint
+                            </button>
+                            <button id="quiz-skip-btn" class="px-4 py-2 rounded-xl bg-paper-aged border-2 border-paper-dark text-ink-light text-sm hover:bg-paper-dark hover:text-ink transition-all flex items-center gap-2">
+                                ⏭️ Skip (-50pts)
+                            </button>
+                        </div>
+                        
+                        <p id="quiz-hint" class="text-center text-gold text-sm mt-4 hidden">
+                            💡 Hint will appear here
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- Quiz Options Grid - Enhanced Multiple Choice -->
+                <div id="quiz-options" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+                    <!-- Options will be dynamically inserted -->
+                </div>
+                
+                <!-- Power-ups & Actions -->
+                <div class="flex items-center justify-center gap-4 mb-6">
+                    <button id="quiz-5050-btn" class="power-up-btn px-5 py-3 rounded-xl bg-paper-warm border-2 border-purple-400/40 text-purple-600 font-medium hover:scale-105 transition-all flex items-center gap-2" title="Remove 2 wrong answers">
+                        <span class="text-xl">🎲</span>
+                        <span>50/50</span>
+                        <span class="text-xs bg-purple-400/20 px-2 py-0.5 rounded-full">x3</span>
+                    </button>
+                    <button id="quiz-freeze-btn" class="power-up-btn px-5 py-3 rounded-xl bg-paper-warm border-2 border-blue-400/40 text-blue-600 font-medium hover:scale-105 transition-all flex items-center gap-2" title="Freeze timer for 10 seconds">
+                        <span class="text-xl">❄️</span>
+                        <span>Freeze</span>
+                        <span class="text-xs bg-blue-400/20 px-2 py-0.5 rounded-full">x2</span>
+                    </button>
+                    <button id="quiz-double-btn" class="power-up-btn px-5 py-3 rounded-xl bg-paper-warm border-2 border-gold/40 text-gold font-medium hover:scale-105 transition-all flex items-center gap-2" title="Double points for this question">
+                        <span class="text-xl">⚡</span>
+                        <span>2x Points</span>
+                        <span class="text-xs bg-gold/20 px-2 py-0.5 rounded-full">x1</span>
+                    </button>
+                </div>
+                
+                <!-- Combo Feed -->
+                <div id="quiz-combo-feed" class="text-center p-4 rounded-xl bg-paper-aged border-2 border-paper-dark">
+                    <p class="combo-log text-lg font-medium text-ink-light">🎯 Choose the correct answer!</p>
+                </div>
+                
+                <!-- Keyboard Hint -->
+                <div class="mt-4 text-center text-ink-light/40 text-sm">
+                    <p>⌨️ Press <kbd class="px-2 py-1 rounded bg-paper-aged mx-1 border border-paper-dark">1</kbd><kbd class="px-2 py-1 rounded bg-paper-aged mx-1 border border-paper-dark">2</kbd><kbd class="px-2 py-1 rounded bg-paper-aged mx-1 border border-paper-dark">3</kbd><kbd class="px-2 py-1 rounded bg-paper-aged mx-1 border border-paper-dark">4</kbd> to select answer</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== LESSONS SECTION ==================== -->
+        <section id="lessons" class="section-page min-h-screen px-4 py-20 hidden">
+            <div class="max-w-6xl mx-auto">
+                <div class="flex items-center gap-4 mb-8">
+                    <button id="lessons-back-to-home" class="p-2 rounded-lg bg-paper-aged hover:bg-paper-dark transition-colors border border-paper-dark">
+                        <svg class="w-6 h-6 text-ink" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                        </svg>
+                    </button>
+                    <h2 class="text-2xl font-bold text-ink">📖 Browse Lessons</h2>
+                </div>
+                
+                <!-- Category Filter -->
+                <div class="flex flex-wrap gap-2 mb-8">
+                    <button class="category-filter-btn px-4 py-2 rounded-full bg-vermillion/15 text-vermillion font-medium transition-all border-2 border-vermillion/30" data-category="all">
+                        All
+                    </button>
+                    {% for category in categories %}
+                    <button class="category-filter-btn px-4 py-2 rounded-full bg-paper-warm text-ink-light font-medium hover:bg-paper-dark transition-all border-2 border-paper-dark" data-category="{{ category }}">
+                        {{ category }}
+                    </button>
+                    {% endfor %}
+                </div>
+                
+                <!-- Lesson Cards Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12" id="lesson-cards">
+                    {% for lesson in lessons %}
+                    <div class="lesson-card group p-6 rounded-2xl bg-paper-warm border-2 border-paper-dark backdrop-blur-sm hover:border-vermillion/50 transition-all cursor-pointer shadow-sm" data-lesson="{{ lesson }}">
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="text-4xl group-hover:scale-110 transition-transform">📖</span>
+                            <span class="px-3 py-1 rounded-full bg-vermillion/15 text-vermillion text-sm font-medium border border-vermillion/30">Lesson {{ lesson }}</span>
+                        </div>
+                        <h3 class="text-2xl font-black font-chinese mb-2 text-ink">第 {{ lesson }} 課</h3>
+                        <p class="text-ink-light/70 text-sm mb-4">Study vocabulary from lesson {{ lesson }}</p>
+                        <div class="flex gap-2">
+                            <button class="flex-1 py-2 rounded-lg bg-jade/15 hover:bg-jade/25 text-jade text-sm font-medium transition-colors lesson-action-btn border border-jade/30" data-lesson="{{ lesson }}" data-action="flashcards">
+                                🃏 Cards
+                            </button>
+                            <button class="flex-1 py-2 rounded-lg bg-vermillion/15 hover:bg-vermillion/25 text-vermillion text-sm font-medium transition-colors lesson-action-btn border border-vermillion/30" data-lesson="{{ lesson }}" data-action="quiz">
+                                🎯 Quiz
+                            </button>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                <!-- Word List Preview -->
+                <div id="lesson-word-list" class="hidden">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-xl font-bold text-ink">📝 Vocabulary List</h3>
+                        <button id="close-word-list" class="p-2 rounded-lg bg-paper-aged hover:bg-paper-dark transition-colors border border-paper-dark text-ink">
+                            ✕
+                        </button>
+                    </div>
+                    <div id="word-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                        <!-- Words will be dynamically inserted -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== MODALS ==================== -->
+        
+        <!-- Result Modal -->
+        <dialog id="result-modal" class="modal bg-transparent backdrop:bg-ink/70 backdrop:backdrop-blur-sm p-4">
+            <div class="modal-content w-full max-w-md p-8 rounded-2xl bg-paper-warm border-3 border-paper-dark text-center shadow-xl">
+                <div id="modal-emoji" class="text-7xl mb-4">🎉</div>
+                <h2 id="modal-kicker" class="text-vermillion text-sm font-bold uppercase tracking-wider mb-2">Correct!</h2>
+                <p id="modal-heading" class="text-xl font-bold text-ink mb-6">Amazing job!</p>
+                
+                <div class="p-6 rounded-2xl bg-paper-aged mb-6 border-2 border-paper-dark">
+                    <p id="modal-character" class="font-chinese text-7xl font-black text-ink mb-3 chinese-glow">中文</p>
+                    <p id="modal-pinyin" class="text-2xl text-jade font-medium mb-2">pīnyīn</p>
+                    <p id="modal-english" class="text-lg text-ink-light mb-2">English</p>
+                    <p id="modal-hint" class="text-sm text-ink-light/60">Hint</p>
+                </div>
+                
+                <button id="modal-next-btn" class="w-full py-4 rounded-2xl bg-gradient-to-r from-vermillion to-cinnabar text-white font-bold text-lg transition-all hover:scale-105 hover:shadow-lg">
+                    ➡️ Next Round
+                </button>
+            </div>
+        </dialog>
+
+        <!-- Completion Modal -->
+        <dialog id="completion-modal" class="modal bg-transparent backdrop:bg-ink/70 backdrop:backdrop-blur-sm p-4">
+            <div class="modal-content w-full max-w-lg p-8 rounded-2xl bg-paper-warm border-3 border-paper-dark text-center shadow-xl">
+                <div class="text-8xl mb-6 animate-bounce">🏆</div>
+                <h2 class="text-3xl font-black text-ink mb-2">Journey Complete!</h2>
+                <p class="text-ink-light/70 mb-8">You've finished the quiz. Here are your results:</p>
+                
+                <div class="grid grid-cols-3 gap-4 mb-8">
+                    <div class="p-4 rounded-2xl bg-paper-aged border-2 border-gold/30">
+                        <p class="text-4xl font-black text-gold" id="final-score">0</p>
+                        <p class="text-sm text-ink-light/70">Score</p>
+                    </div>
+                    <div class="p-4 rounded-2xl bg-paper-aged border-2 border-jade/30">
+                        <p class="text-4xl font-black text-jade" id="final-accuracy">0%</p>
+                        <p class="text-sm text-ink-light/70">Accuracy</p>
+                    </div>
+                    <div class="p-4 rounded-2xl bg-paper-aged border-2 border-vermillion/30">
+                        <p class="text-4xl font-black text-vermillion" id="final-best-streak">0</p>
+                        <p class="text-sm text-ink-light/70">Best Streak</p>
+                    </div>
+                </div>
+                
+                <div class="flex gap-4">
+                    <button id="restart-quiz-btn" class="flex-1 py-4 rounded-2xl bg-gradient-to-r from-vermillion to-cinnabar text-white font-bold text-lg transition-all hover:scale-105">
+                        🔄 Play Again
+                    </button>
+                    <button id="go-home-btn" class="flex-1 py-4 rounded-2xl bg-paper-aged border-2 border-paper-dark text-ink font-bold text-lg transition-all hover:bg-paper-dark">
+                        🏠 Home
+                    </button>
+                </div>
+            </div>
+        </dialog>
+    </main>
+
+    <!-- Footer -->
+    <footer class="relative z-10 border-t border-paper-dark py-8 px-4 bg-paper-warm">
+        <div class="max-w-6xl mx-auto text-center">
+            <p class="text-ink-light/50 text-sm">
+                🏮 Made with ❤️ for learning Traditional Chinese 🇹🇼 | {{ total_words }} words from Lessons {{ lessons|join(', ') }} 🐉
+            </p>
+        </div>
+    </footer>
+
+    <!-- Audio Elements -->
+    <audio id="sfx-correct" preload="auto">
+        <source src="https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="sfx-wrong" preload="auto">
+        <source src="https://assets.mixkit.co/active_storage/sfx/2955/2955-preview.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="sfx-flip" preload="auto">
+        <source src="https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- Main Game Script -->
+    <script src="{{ url_for('static', filename='js/game.js') }}"></script>
+</body>
+</html>

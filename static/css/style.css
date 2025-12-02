@@ -1,0 +1,808 @@
+/* ========================================
+   華語學習 - Chinese Learning App
+   Elegant Ink & Paper Calligraphy Theme
+   ======================================== */
+
+/* ===== CSS Variables - Ink & Paper Theme ===== */
+:root {
+    /* Ink colors */
+    --ink: #1a1a2e;
+    --ink-light: #2d2d44;
+    --ink-wash: rgba(26, 26, 46, 0.6);
+    
+    /* Paper colors */
+    --paper: #faf8f5;
+    --paper-warm: #f5f0e6;
+    --paper-aged: #ebe3d5;
+    --paper-dark: #e8dcc8;
+    
+    /* Accent colors - inspired by seal stamps and nature */
+    --vermillion: #d1462f;
+    --cinnabar: #e85d4c;
+    --jade: #4a8c7b;
+    --jade-light: #6aab9c;
+    --gold: #c9a227;
+    --gold-warm: #ddb84d;
+    --bamboo: #7a8b6e;
+    
+    /* Semantic colors */
+    --primary: var(--vermillion);
+    --accent: var(--jade);
+    --accent-alt: var(--gold);
+    --success: #4a8c7b;
+    --error: #c94d38;
+    
+    /* Legacy mappings for compatibility */
+    --dark: var(--paper);
+    --dark-lighter: var(--paper-warm);
+    --dark-card: var(--paper-aged);
+    
+    /* Shadows */
+    --shadow-soft: 0 4px 20px rgba(26, 26, 46, 0.08);
+    --shadow-medium: 0 8px 30px rgba(26, 26, 46, 0.12);
+    --shadow-heavy: 0 12px 40px rgba(26, 26, 46, 0.18);
+}
+
+/* ===== Base Styles ===== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--paper);
+    background-image: 
+        url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23d4c9b8' fill-opacity='0.3'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    color: var(--ink);
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+/* ===== Decorative Ink Wash Background ===== */
+.orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(120px);
+    opacity: 0.15;
+    animation: inkFloat 25s infinite ease-in-out;
+}
+
+.orb-1 {
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, var(--ink) 0%, transparent 70%);
+    top: -150px;
+    left: -150px;
+    animation-delay: 0s;
+}
+
+.orb-2 {
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, var(--vermillion) 0%, transparent 70%);
+    bottom: -100px;
+    right: -100px;
+    animation-delay: -8s;
+    opacity: 0.08;
+}
+
+.orb-3 {
+    width: 350px;
+    height: 350px;
+    background: radial-gradient(circle, var(--jade) 0%, transparent 70%);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    animation-delay: -16s;
+    opacity: 0.06;
+}
+
+@keyframes inkFloat {
+    0%, 100% {
+        transform: translate(0, 0) scale(1);
+        opacity: 0.12;
+    }
+    33% {
+        transform: translate(20px, -15px) scale(1.03);
+        opacity: 0.18;
+    }
+    66% {
+        transform: translate(-15px, 10px) scale(0.97);
+        opacity: 0.1;
+    }
+}
+
+/* Subtle paper texture dots instead of stars */
+.stars {
+    position: absolute;
+    inset: 0;
+    background-image: 
+        radial-gradient(1px 1px at 20px 30px, rgba(26,26,46,0.1), transparent),
+        radial-gradient(1px 1px at 80px 60px, rgba(26,26,46,0.08), transparent),
+        radial-gradient(1px 1px at 140px 90px, rgba(26,26,46,0.06), transparent),
+        radial-gradient(1px 1px at 200px 120px, rgba(26,26,46,0.1), transparent);
+    background-repeat: repeat;
+    background-size: 250px 150px;
+    animation: none;
+    opacity: 0.5;
+}
+
+/* ===== Chinese Character Brush Stroke Effect ===== */
+.chinese-glow {
+    text-shadow: 
+        2px 2px 0 rgba(26, 26, 46, 0.1),
+        4px 4px 8px rgba(26, 26, 46, 0.15);
+    color: var(--ink);
+}
+
+/* ===== Navigation - Elegant Header ===== */
+.nav-link {
+    position: relative;
+    padding: 0.5rem 0;
+    color: var(--ink-light);
+}
+
+.nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--vermillion), var(--gold));
+    transition: width 0.3s ease;
+}
+
+.nav-link:hover::after {
+    width: 100%;
+}
+
+.nav-link:hover {
+    color: var(--vermillion);
+}
+
+/* ===== 3D Flashcard Styles - Paper Card Effect ===== */
+.flashcard-container {
+    perspective: 1500px;
+}
+
+.flashcard-3d {
+    transform-style: preserve-3d;
+    transition: transform 0.8s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+.flashcard-3d.flipped {
+    transform: rotateY(180deg);
+}
+
+.flashcard-face {
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    background: var(--paper-warm);
+    border: 3px solid var(--paper-dark);
+    box-shadow: var(--shadow-heavy), inset 0 0 60px rgba(235, 227, 213, 0.5);
+}
+
+.flashcard-front {
+    z-index: 2;
+}
+
+.flashcard-back {
+    transform: rotateY(180deg);
+    background: linear-gradient(135deg, var(--paper-warm) 0%, var(--paper-aged) 100%);
+}
+
+/* Card hover effect */
+.flashcard-3d:not(.flipped):hover {
+    transform: rotateY(5deg) rotateX(-2deg);
+    box-shadow: var(--shadow-heavy);
+}
+
+/* ===== Quiz Option Tiles - Elegant Paper Cards ===== */
+.quiz-option {
+    position: relative;
+    padding: 1.5rem;
+    border-radius: 1rem;
+    background: var(--paper-warm);
+    border: 2px solid var(--paper-dark);
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 160px;
+    box-shadow: var(--shadow-soft);
+}
+
+.quiz-option::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, transparent 40%, rgba(255, 255, 255, 0.3) 50%, transparent 60%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.quiz-option::after {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border-radius: 1rem;
+    background: linear-gradient(135deg, var(--vermillion), var(--gold));
+    z-index: -1;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.quiz-option .option-number {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--paper-aged);
+    border: 2px solid var(--ink-wash);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--ink-light);
+    transition: all 0.3s ease;
+}
+
+.quiz-option:hover {
+    transform: translateY(-8px) scale(1.02);
+    border-color: var(--vermillion);
+    box-shadow: var(--shadow-heavy);
+}
+
+.quiz-option:hover::before {
+    opacity: 1;
+}
+
+.quiz-option:hover .option-number {
+    background: var(--vermillion);
+    color: var(--paper);
+    border-color: var(--vermillion);
+}
+
+.quiz-option:active {
+    transform: translateY(-2px) scale(1.01);
+}
+
+.quiz-option.correct {
+    border-color: var(--jade) !important;
+    background: linear-gradient(145deg, rgba(74, 140, 123, 0.15), var(--paper-warm)) !important;
+    animation: correctBounce 0.6s ease;
+}
+
+.quiz-option.correct .option-number {
+    background: var(--jade);
+    color: var(--paper);
+    border-color: var(--jade);
+}
+
+.quiz-option.correct::after {
+    opacity: 0;
+}
+
+.quiz-option.wrong {
+    border-color: var(--error) !important;
+    background: linear-gradient(145deg, rgba(201, 77, 56, 0.12), var(--paper-warm)) !important;
+    animation: wrongShake 0.5s ease;
+}
+
+.quiz-option.wrong .option-number {
+    background: var(--error);
+    color: var(--paper);
+    border-color: var(--error);
+}
+
+.quiz-option.disabled {
+    pointer-events: none;
+    opacity: 0.4;
+    transform: scale(0.98);
+}
+
+.quiz-option.eliminated {
+    opacity: 0.2;
+    transform: scale(0.95);
+    pointer-events: none;
+}
+
+.quiz-option .character {
+    font-family: 'Noto Sans TC', sans-serif;
+    font-weight: 900;
+    font-size: 3.5rem;
+    color: var(--ink);
+    margin-bottom: 0.5rem;
+    text-shadow: 2px 2px 4px rgba(26, 26, 46, 0.1);
+    transition: all 0.3s ease;
+}
+
+.quiz-option:hover .character {
+    color: var(--vermillion);
+    transform: scale(1.08);
+}
+
+.quiz-option .pinyin {
+    font-size: 1rem;
+    color: var(--jade);
+    opacity: 0.9;
+    font-weight: 600;
+}
+
+.quiz-option .english-hint {
+    font-size: 0.75rem;
+    color: var(--ink-wash);
+    margin-top: 0.25rem;
+}
+
+@keyframes correctBounce {
+    0% { transform: scale(1); }
+    30% { transform: scale(1.08); }
+    50% { transform: scale(0.98); }
+    70% { transform: scale(1.02); }
+    100% { transform: scale(1); }
+}
+
+@keyframes wrongShake {
+    0%, 100% { transform: translateX(0) rotate(0); }
+    20% { transform: translateX(-12px) rotate(-2deg); }
+    40% { transform: translateX(12px) rotate(2deg); }
+    60% { transform: translateX(-8px) rotate(-1deg); }
+    80% { transform: translateX(8px) rotate(1deg); }
+}
+
+/* ===== Quiz Type Buttons - Seal Style ===== */
+.quiz-type-btn {
+    transition: all 0.2s ease;
+}
+
+.quiz-type-btn.active {
+    background: rgba(209, 70, 47, 0.15);
+    color: var(--vermillion);
+    border-radius: 0.5rem;
+}
+
+.quiz-type-btn:hover:not(.active) {
+    color: var(--ink);
+}
+
+/* ===== Power-up Buttons ===== */
+.power-up-btn {
+    position: relative;
+    overflow: hidden;
+    background: var(--paper-warm);
+    border: 2px solid var(--paper-dark);
+}
+
+.power-up-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, transparent 40%, rgba(255, 255, 255, 0.5) 50%, transparent 60%);
+    transform: translateX(-100%);
+    transition: transform 0.6s ease;
+}
+
+.power-up-btn:hover {
+    border-color: var(--gold);
+    box-shadow: var(--shadow-medium);
+}
+
+.power-up-btn:hover::before {
+    transform: translateX(100%);
+}
+
+.power-up-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+.power-up-btn:disabled:hover::before {
+    transform: translateX(-100%);
+}
+
+/* ===== Stat Cards - Paper Style ===== */
+.stat-card {
+    transition: all 0.3s ease;
+    background: var(--paper-warm);
+    border: 2px solid var(--paper-dark);
+    box-shadow: var(--shadow-soft);
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-medium);
+}
+
+/* ===== Particles - Ink Drops ===== */
+.particle {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    pointer-events: none;
+    background: var(--vermillion);
+    animation: inkDrop 1.2s ease-out forwards;
+}
+
+@keyframes inkDrop {
+    0% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(-120px) scale(0.3);
+    }
+}
+
+/* ===== Modal Styles - Scroll Paper ===== */
+.modal {
+    border: none;
+    border-radius: 1rem;
+    max-width: 90vw;
+    padding: 0;
+    background: var(--paper-warm);
+    border: 3px solid var(--paper-dark);
+    box-shadow: var(--shadow-heavy);
+}
+
+.modal::backdrop {
+    background: rgba(26, 26, 46, 0.7);
+    backdrop-filter: blur(8px);
+}
+
+.modal[open] {
+    animation: modalPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes modalPop {
+    0% {
+        opacity: 0;
+        transform: scale(0.8) translateY(20px);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+/* ===== Word Cards in Lessons ===== */
+.word-card {
+    padding: 1.5rem;
+    border-radius: 1rem;
+    background: var(--paper-warm);
+    border: 2px solid var(--paper-dark);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow-soft);
+}
+
+.word-card:hover {
+    border-color: var(--vermillion);
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-medium);
+}
+
+.word-card .chinese {
+    font-family: 'Noto Sans TC', sans-serif;
+    font-weight: 900;
+    font-size: 2.5rem;
+    color: var(--ink);
+    margin-bottom: 0.5rem;
+}
+
+.word-card .pinyin {
+    color: var(--jade);
+    font-size: 1rem;
+    margin-bottom: 0.25rem;
+    font-weight: 600;
+}
+
+.word-card .english {
+    color: var(--ink-light);
+    font-size: 0.875rem;
+}
+
+/* ===== Lesson Cards ===== */
+.lesson-card {
+    transition: all 0.3s ease;
+    background: var(--paper-warm);
+    border: 2px solid var(--paper-dark);
+    box-shadow: var(--shadow-soft);
+}
+
+.lesson-card:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-heavy);
+    border-color: var(--vermillion);
+}
+
+/* ===== Knowledge Buttons ===== */
+.knowledge-btn {
+    transition: all 0.2s ease;
+    border: 2px solid transparent;
+}
+
+.knowledge-btn:active {
+    transform: scale(0.95);
+}
+
+/* ===== Category Filter Buttons ===== */
+.category-filter-btn {
+    border: 2px solid var(--paper-dark);
+    background: var(--paper-warm);
+    color: var(--ink-light);
+    transition: all 0.2s ease;
+}
+
+.category-filter-btn.active {
+    background: rgba(209, 70, 47, 0.1);
+    color: var(--vermillion);
+    border-color: var(--vermillion);
+}
+
+.category-filter-btn:hover:not(.active) {
+    border-color: var(--ink-wash);
+}
+
+/* ===== Study Mode Cards ===== */
+.study-mode-card {
+    transition: all 0.3s ease;
+    background: var(--paper-warm);
+    border: 2px solid var(--paper-dark);
+    box-shadow: var(--shadow-soft);
+}
+
+.study-mode-card:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: var(--shadow-heavy);
+    border-color: var(--vermillion);
+}
+
+/* ===== Timer Ring Animation ===== */
+.timer-ring-warning {
+    animation: timerPulse 1s infinite;
+}
+
+@keyframes timerPulse {
+    0%, 100% {
+        stroke: var(--error);
+        filter: drop-shadow(0 0 8px var(--error));
+    }
+    50% {
+        stroke: #e85d4c;
+        filter: drop-shadow(0 0 16px var(--error));
+    }
+}
+
+/* ===== Combo Feed Animation ===== */
+.combo-log {
+    transition: all 0.3s ease;
+    color: var(--ink-light);
+}
+
+.combo-log.celebrate {
+    animation: celebrate 0.5s ease;
+}
+
+@keyframes celebrate {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+/* ===== Responsive Adjustments ===== */
+@media (max-width: 768px) {
+    .flashcard-3d {
+        min-height: 320px !important;
+    }
+    
+    #fc-chinese {
+        font-size: 5rem !important;
+    }
+    
+    .quiz-option .character {
+        font-size: 2.5rem;
+    }
+    
+    .orb-1, .orb-2, .orb-3 {
+        opacity: 0.1;
+    }
+}
+
+@media (max-width: 480px) {
+    .flashcard-3d {
+        min-height: 280px !important;
+    }
+    
+    #fc-chinese {
+        font-size: 4rem !important;
+    }
+    
+    .quiz-option .character {
+        font-size: 2rem;
+    }
+}
+
+/* ===== Scrollbar Styling - Elegant ===== */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--paper-aged);
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(var(--vermillion), var(--gold));
+    border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--vermillion);
+}
+
+/* ===== Selection Styling ===== */
+::selection {
+    background: var(--vermillion);
+    color: var(--paper);
+}
+
+/* ===== Focus States for Accessibility ===== */
+button:focus-visible,
+a:focus-visible,
+select:focus-visible {
+    outline: 2px solid var(--vermillion);
+    outline-offset: 2px;
+}
+
+/* ===== Loading Animation ===== */
+.loading {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--paper-dark);
+    border-radius: 50%;
+    border-top-color: var(--vermillion);
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* ===== Smooth Section Transitions ===== */
+.section-page {
+    animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ===== Streak Fire Animation ===== */
+.streak-fire {
+    display: inline-block;
+    animation: fireFlicker 0.5s infinite alternate;
+}
+
+@keyframes fireFlicker {
+    0% { transform: scale(1) rotate(-2deg); }
+    100% { transform: scale(1.1) rotate(2deg); }
+}
+
+/* ===== Badge Pulse - Seal Stamp Effect ===== */
+.badge-pulse {
+    animation: badgePulse 2s infinite;
+}
+
+@keyframes badgePulse {
+    0%, 100% {
+        box-shadow: 0 0 0 0 rgba(209, 70, 47, 0.4);
+    }
+    50% {
+        box-shadow: 0 0 0 10px rgba(209, 70, 47, 0);
+    }
+}
+
+/* ===== Keyboard Hint Styling ===== */
+kbd {
+    font-family: 'SF Mono', 'Monaco', 'Inconsolata', monospace;
+    font-size: 0.75rem;
+    background: var(--paper-aged);
+    border: 1px solid var(--paper-dark);
+    color: var(--ink-light);
+}
+
+/* ===== Print Styles ===== */
+@media print {
+    .orb, .stars, nav, footer, button, .modal {
+        display: none !important;
+    }
+    
+    body {
+        background: white;
+        color: black;
+    }
+}
+
+/* ===== Additional Elegant Touches ===== */
+
+/* Decorative seal stamp effect for headers */
+.seal-stamp {
+    position: relative;
+}
+
+.seal-stamp::after {
+    content: '印';
+    position: absolute;
+    top: -10px;
+    right: -30px;
+    font-family: 'Noto Sans TC', serif;
+    font-size: 2rem;
+    color: var(--vermillion);
+    opacity: 0.3;
+    transform: rotate(15deg);
+}
+
+/* Brush stroke underline effect */
+.brush-underline {
+    position: relative;
+}
+
+.brush-underline::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, 
+        transparent 0%, 
+        var(--vermillion) 10%, 
+        var(--vermillion) 90%, 
+        transparent 100%);
+    border-radius: 2px;
+}
+
+/* Paper curl effect for cards */
+.paper-curl::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, transparent 50%, var(--paper-dark) 50%);
+    border-radius: 0 0 0.5rem 0;
+}
+
+/* Ink fade effect */
+.ink-fade {
+    background: linear-gradient(180deg, var(--ink) 0%, var(--ink-light) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}

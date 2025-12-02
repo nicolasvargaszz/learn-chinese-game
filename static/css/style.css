@@ -727,6 +727,22 @@ select:focus-visible {
     }
 }
 
+/* ===== Important Notice Animation ===== */
+.animate-pulse-slow {
+    animation: pulseSlow 3s ease-in-out infinite;
+}
+
+@keyframes pulseSlow {
+    0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 25px 50px -12px rgba(209, 70, 47, 0.25);
+    }
+    50% {
+        transform: scale(1.02);
+        box-shadow: 0 25px 50px -12px rgba(209, 70, 47, 0.4);
+    }
+}
+
 /* ===== Keyboard Hint Styling ===== */
 kbd {
     font-family: 'SF Mono', 'Monaco', 'Inconsolata', monospace;

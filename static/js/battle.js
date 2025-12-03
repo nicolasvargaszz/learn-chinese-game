@@ -84,8 +84,15 @@ const battleDom = {
 
 // ==================== INITIALIZATION ====================
 function initBattle() {
-    // Connect to Socket.IO
-    battleState.socket = io();
+    // Connect to Socket.IO with polling transport for better compatibility
+    battleState.socket = io({
+        transports: ['polling', 'websocket'],
+        upgrade: true,
+        reconnection: true,
+        reconnectionAttempts: 5,
+        reconnectionDelay: 1000,
+        timeout: 20000
+    });
     
     // Bind UI events
     bindBattleEvents();

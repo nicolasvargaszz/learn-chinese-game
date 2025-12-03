@@ -14,6 +14,9 @@ const state = {
     fcIndex: 0,
     fcFlipped: false,
     fcLearned: new Set(),
+
+    // Writing state
+    wrIndex: 0,
     
     // Quiz state
     quizDeck: [],
@@ -56,7 +59,9 @@ const dom = {
     sections: {
         home: $('#home'),
         flashcards: $('#flashcards'),
+        writing: $('#writing'),
         quiz: $('#quiz'),
+        battle: $('#battle'),
         lessons: $('#lessons')
     },
     
@@ -116,6 +121,17 @@ const dom = {
     closeWordList: $('#close-word-list'),
     categoryFilterBtns: $$('.category-filter-btn'),
     lessonActionBtns: $$('.lesson-action-btn'),
+
+    // Writing
+    writingBackBtn: $('#writing-back-to-home'),
+    wrWordSelect: $('#wr-word-select'),
+    wrChinese: $('#wr-chinese'),
+    wrPinyin: $('#wr-pinyin'),
+    wrEnglish: $('#wr-english'),
+    wrHint: $('#wr-hint'),
+    wrLesson: $('#wr-lesson'),
+    wrPrevBtn: $('#wr-prev'),
+    wrNextBtn: $('#wr-next'),
     
     // Modals
     resultModal: $('#result-modal'),
@@ -215,6 +231,7 @@ function updateHomeStats() {
 function bindEvents() {
     // Navigation
     dom.navLogo?.addEventListener('click', () => showSection('home'));
+    dom.writingBackBtn?.addEventListener('click', () => showSection('home'));
     dom.navLinks.forEach(link => {
         link.addEventListener('click', (e) => {
             e.preventDefault();
@@ -241,6 +258,11 @@ function bindEvents() {
                 showSection('quiz');
                 startQuiz();
             }
+            else if (mode === 'writing') {
+                showSection('writing');
+                initWriting();
+            }
+            else if (mode === 'battle') showSection('battle');
             else if (mode === 'lessons') showSection('lessons');
         });
     });
@@ -257,6 +279,10 @@ function bindEvents() {
         btn.addEventListener('click', () => rateKnowledge(parseInt(btn.dataset.level)));
     });
     
+    // Writing prev/next
+    dom.wrPrevBtn?.addEventListener('click', prevWriting);
+    dom.wrNextBtn?.addEventListener('click', nextWriting);
+
     // Quiz events
     dom.quizBackBtn?.addEventListener('click', () => {
         stopQuizTimer();
@@ -345,6 +371,8 @@ function showSection(sectionName) {
         // Initialize section if needed
         if (sectionName === 'flashcards') {
             initFlashcards();
+        } else if (sectionName === 'writing') {
+            initWriting();
         }
     }
     
@@ -1141,3 +1169,133 @@ function handleKeyboard(e) {
 
 // ==================== EXPORT FOR DEBUGGING ====================
 window.gameState = state;
+
+
+// ==================== WRITING FUNCTIONS ====================
+function initWriting() {
+    if (!state.allWords.length) return;
+    populateWritingSelect();
+    // If an option is already selected, use it; otherwise default to 0
+    if (dom.wrWordSelect && dom.wrWordSelect.value !== '') {
+        state.wrIndex = parseInt(dom.wrWordSelect.value) || 0;
+    } else {
+        state.wrIndex = 0;
+    }
+    renderWritingCard();
+}
+
+function populateWritingSelect() {
+    if (!dom.wrWordSelect) return;
+    dom.wrWordSelect.innerHTML = '';
+
+    state.allWords.forEach((word, idx) => {
+        const opt = document.createElement('option');
+        opt.value = idx;
+        opt.textContent = `${word.traditional} – ${word.english}`;
+        dom.wrWordSelect.appendChild(opt);
+    });
+
+    dom.wrWordSelect.addEventListener('change', () => {
+        const val = parseInt(dom.wrWordSelect.value);
+        if (!isNaN(val)) {
+            state.wrIndex = val;
+            renderWritingCard();
+        }
+    });
+}
+
+function renderWritingCard() {
+    if (!state.allWords.length) return;
+
+    const idx = Math.max(0, Math.min(state.wrIndex, state.allWords.length - 1));
+    state.wrIndex = idx;
+    const word = state.allWords[idx];
+
+    if (dom.wrChinese) dom.wrChinese.textContent = word.traditional;
+    if (dom.wrPinyin) dom.wrPinyin.textContent = word.pinyin;
+    if (dom.wrEnglish) dom.wrEnglish.textContent = word.english;
+    if (dom.wrHint) dom.wrHint.textContent = word.hint || word.category || '';
+    if (dom.wrLesson) dom.wrLesson.textContent = word.lesson ? `Lesson ${word.lesson}` : 'Lesson';
+
+    if (dom.wrWordSelect && dom.wrWordSelect.value !== String(idx)) {
+        dom.wrWordSelect.value = String(idx);
+    }
+}
+
+function prevWriting() {
+    if (state.wrIndex > 0) {
+        state.wrIndex--;
+        renderWritingCard();
+    }
+}
+
+function nextWriting() {
+    if (state.wrIndex < state.allWords.length - 1) {
+        state.wrIndex++;
+        renderWritingCard();
+    }
+}
+
+
+// ========================== HANDWRITING CANVAS (FRONT-END ONLY) ==========================
+const canvas = document.getElementById('write-canvas');
+let ctx = null;
+let drawing = false;
+
+if (canvas) {
+    ctx = canvas.getContext('2d');
+    ctx.lineWidth = 10;
+    ctx.lineCap = 'round';
+    ctx.strokeStyle = '#1a1a2e';
+
+    const getPos = (e) => {
+        const rect = canvas.getBoundingClientRect();
+        if (e.touches && e.touches[0]) {
+            return {
+                x: e.touches[0].clientX - rect.left,
+                y: e.touches[0].clientY - rect.top
+            };
+        }
+        return {
+            x: e.clientX - rect.left,
+            y: e.clientY - rect.top
+        };
+    };
+
+    const startDraw = (e) => {
+        drawing = true;
+        const { x, y } = getPos(e);
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+    };
+
+    const endDraw = () => {
+        drawing = false;
+        ctx.beginPath();
+    };
+
+    const draw = (e) => {
+        if (!drawing) return;
+        e.preventDefault();
+        const { x, y } = getPos(e);
+        ctx.lineTo(x, y);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+    };
+
+    canvas.addEventListener('mousedown', startDraw);
+    canvas.addEventListener('mousemove', draw);
+    canvas.addEventListener('mouseup', endDraw);
+    canvas.addEventListener('mouseout', endDraw);
+
+    canvas.addEventListener('touchstart', startDraw, { passive: false });
+    canvas.addEventListener('touchmove', draw, { passive: false });
+    canvas.addEventListener('touchend', endDraw);
+}
+
+const clearBtn = document.getElementById('clear-canvas');
+clearBtn?.addEventListener('click', () => {
+    if (!ctx || !canvas) return;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+});

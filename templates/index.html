@@ -132,7 +132,7 @@
                 </div>
                 
                 <!-- Study Mode Cards -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl mx-auto">
                     <div class="study-mode-card p-6 rounded-2xl bg-paper-warm border-2 border-paper-dark backdrop-blur-sm hover:border-vermillion/50 transition-all cursor-pointer" data-mode="flashcards">
                         <div class="text-4xl mb-4">🃏🀄</div>
                         <h3 class="text-xl font-bold mb-2 text-ink">Flashcards</h3>
@@ -143,10 +143,11 @@
                         <h3 class="text-xl font-bold mb-2 text-ink">Quiz Mode</h3>
                         <p class="text-ink-light/70 text-sm">Test your knowledge with timed multiple choice questions.</p>
                     </div>
-                    <div class="study-mode-card p-6 rounded-2xl bg-paper-warm border-2 border-paper-dark backdrop-blur-sm hover:border-jade/50 transition-all cursor-pointer" data-mode="writing">
-                        <div class="text-4xl mb-4">✍️🀄</div>
-                        <h3 class="text-xl font-bold mb-2 text-ink">Writing Practice</h3>
-                        <p class="text-ink-light/70 text-sm">Select any word and practice writing it.</p>
+                    <div class="study-mode-card p-6 rounded-2xl bg-gradient-to-br from-purple-500/20 to-pink-500/20 border-2 border-purple-400/50 backdrop-blur-sm hover:border-purple-400 hover:shadow-lg hover:shadow-purple-500/20 transition-all cursor-pointer animate-pulse-slow" data-mode="battle">
+                        <div class="text-4xl mb-4">⚔️🏆</div>
+                        <h3 class="text-xl font-bold mb-2 text-purple-600">Online Battle</h3>
+                        <p class="text-ink-light/70 text-sm">Challenge friends in real-time Kahoot-style battles!</p>
+                        <span class="inline-block mt-2 px-2 py-1 bg-purple-500/20 text-purple-600 text-xs font-bold rounded-full">NEW!</span>
                     </div>
                     <div class="study-mode-card p-6 rounded-2xl bg-paper-warm border-2 border-paper-dark backdrop-blur-sm hover:border-gold/50 transition-all cursor-pointer" data-mode="lessons">
                         <div class="text-4xl mb-4">📖🎋</div>
@@ -548,6 +549,228 @@
             </div>
         </section>
 
+        <!-- ==================== BATTLE SECTION ==================== -->
+        <section id="battle" class="section-page min-h-screen px-4 py-20 hidden">
+            <div class="max-w-4xl mx-auto">
+                
+                <!-- Battle Header -->
+                <div class="flex items-center gap-4 mb-8">
+                    <button id="battle-back-to-home" class="p-2 rounded-lg bg-paper-aged hover:bg-paper-dark transition-colors border border-paper-dark">
+                        <svg class="w-6 h-6 text-ink" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                        </svg>
+                    </button>
+                    <h2 class="text-2xl font-bold text-ink">⚔️ Online Battle</h2>
+                </div>
+                
+                <!-- Battle Lobby View (Initial) -->
+                <div id="battle-lobby" class="space-y-8">
+                    <!-- Name Input -->
+                    <div class="p-8 rounded-2xl bg-gradient-to-br from-purple-500/10 to-pink-500/10 border-2 border-purple-400/30 text-center">
+                        <h3 class="text-2xl font-bold text-purple-600 mb-4">🎮 Enter Your Name</h3>
+                        <input type="text" id="battle-player-name" 
+                            class="w-full max-w-md px-6 py-4 text-xl text-center rounded-xl bg-paper-warm border-2 border-purple-400/50 focus:border-purple-500 focus:outline-none transition-all placeholder-ink-light/50"
+                            placeholder="Your nickname..."
+                            maxlength="20">
+                    </div>
+                    
+                    <!-- Create or Join -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Create Room -->
+                        <div class="p-8 rounded-2xl bg-paper-warm border-2 border-paper-dark text-center hover:border-purple-400/50 transition-all">
+                            <div class="text-5xl mb-4">🏠</div>
+                            <h3 class="text-xl font-bold text-ink mb-2">Create Room</h3>
+                            <p class="text-ink-light/70 text-sm mb-6">Host a new battle and invite friends with a code</p>
+                            <button id="create-battle-room" class="w-full py-4 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold text-lg transition-all hover:scale-105 hover:shadow-lg hover:shadow-purple-500/30">
+                                Create Room
+                            </button>
+                        </div>
+                        
+                        <!-- Join Room -->
+                        <div class="p-8 rounded-2xl bg-paper-warm border-2 border-paper-dark text-center hover:border-purple-400/50 transition-all">
+                            <div class="text-5xl mb-4">🚪</div>
+                            <h3 class="text-xl font-bold text-ink mb-2">Join Room</h3>
+                            <p class="text-ink-light/70 text-sm mb-4">Enter a room code to join an existing battle</p>
+                            <input type="text" id="battle-room-code-input" 
+                                class="w-full px-4 py-3 text-center text-2xl font-mono uppercase rounded-xl bg-paper-aged border-2 border-paper-dark focus:border-purple-400 focus:outline-none transition-all placeholder-ink-light/30 tracking-widest mb-4"
+                                placeholder="ABC123"
+                                maxlength="6">
+                            <button id="join-battle-room" class="w-full py-4 rounded-xl bg-gradient-to-r from-jade to-bamboo text-white font-bold text-lg transition-all hover:scale-105 hover:shadow-lg hover:shadow-jade/30">
+                                Join Room
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Error Message -->
+                    <div id="battle-error" class="hidden p-4 rounded-xl bg-vermillion/20 border-2 border-vermillion text-vermillion text-center font-medium">
+                        Error message here
+                    </div>
+                </div>
+                
+                <!-- Waiting Room View -->
+                <div id="battle-waiting-room" class="hidden space-y-6">
+                    <div class="p-8 rounded-2xl bg-gradient-to-br from-purple-500/10 to-pink-500/10 border-2 border-purple-400/30 text-center">
+                        <h3 class="text-xl font-bold text-ink mb-2">Room Code</h3>
+                        <div id="battle-room-code-display" class="text-5xl font-mono font-black text-purple-600 tracking-widest mb-4">------</div>
+                        <p class="text-ink-light/70 text-sm">Share this code with your friends!</p>
+                    </div>
+                    
+                    <!-- Players List -->
+                    <div class="p-6 rounded-2xl bg-paper-warm border-2 border-paper-dark">
+                        <h3 class="text-lg font-bold text-ink mb-4 flex items-center gap-2">
+                            <span>👥 Players</span>
+                            <span id="battle-player-count" class="px-2 py-1 bg-purple-500/20 text-purple-600 text-sm rounded-full">0</span>
+                        </h3>
+                        <div id="battle-players-list" class="space-y-2">
+                            <!-- Players will be added here dynamically -->
+                        </div>
+                    </div>
+                    
+                    <!-- Start Button (Host Only) -->
+                    <button id="start-battle-btn" class="hidden w-full py-5 rounded-2xl bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold text-xl transition-all hover:scale-105 hover:shadow-lg hover:shadow-purple-500/30">
+                        ⚔️ Start Battle!
+                    </button>
+                    
+                    <!-- Waiting Message (Non-Host) -->
+                    <div id="waiting-for-host" class="hidden text-center py-4 text-ink-light/70">
+                        <div class="animate-pulse">⏳ Waiting for host to start the game...</div>
+                    </div>
+                    
+                    <button id="leave-battle-btn" class="w-full py-3 rounded-xl bg-paper-aged border-2 border-paper-dark text-ink font-medium transition-all hover:bg-paper-dark">
+                        Leave Room
+                    </button>
+                </div>
+                
+                <!-- Battle Game View -->
+                <div id="battle-game" class="hidden space-y-6">
+                    <!-- Countdown Overlay -->
+                    <div id="battle-countdown" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-ink/80 backdrop-blur-sm">
+                        <div class="text-center">
+                            <div id="countdown-number" class="text-9xl font-black text-white animate-bounce">3</div>
+                            <p class="text-2xl text-white/80 mt-4">Get Ready!</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Game Header -->
+                    <div class="flex items-center justify-between p-4 rounded-2xl bg-paper-warm border-2 border-paper-dark">
+                        <div class="flex items-center gap-4">
+                            <div class="text-center">
+                                <p class="text-xs text-ink-light/60 uppercase">Question</p>
+                                <p class="text-2xl font-black text-ink"><span id="battle-question-num">1</span>/<span id="battle-total-questions">10</span></p>
+                            </div>
+                        </div>
+                        <div class="relative w-16 h-16">
+                            <svg class="w-full h-full -rotate-90">
+                                <circle cx="32" cy="32" r="28" fill="none" stroke="#e8dcc8" stroke-width="6"></circle>
+                                <circle id="battle-timer-ring" cx="32" cy="32" r="28" fill="none" stroke="url(#battle-timer-gradient)" stroke-width="6" stroke-linecap="round" stroke-dasharray="175.9" stroke-dashoffset="0"></circle>
+                                <defs>
+                                    <linearGradient id="battle-timer-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                        <stop offset="0%" stop-color="#a855f7"/>
+                                        <stop offset="100%" stop-color="#ec4899"/>
+                                    </linearGradient>
+                                </defs>
+                            </svg>
+                            <span id="battle-timer" class="absolute inset-0 flex items-center justify-center text-xl font-black text-purple-600">15</span>
+                        </div>
+                        <div class="text-center">
+                            <p class="text-xs text-ink-light/60 uppercase">Your Score</p>
+                            <p id="battle-my-score" class="text-2xl font-black text-gold">0</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Question Card -->
+                    <div class="p-8 rounded-2xl bg-gradient-to-br from-purple-500/10 to-pink-500/10 border-2 border-purple-400/30 text-center">
+                        <p class="text-sm text-purple-600 font-medium mb-2">What is the Chinese character for:</p>
+                        <h2 id="battle-question-text" class="text-4xl md:text-5xl font-black text-ink">Loading...</h2>
+                    </div>
+                    
+                    <!-- Answer Options -->
+                    <div id="battle-options" class="grid grid-cols-2 gap-4">
+                        <!-- Options will be added dynamically -->
+                    </div>
+                    
+                    <!-- Answer Feedback -->
+                    <div id="battle-feedback" class="hidden p-6 rounded-2xl text-center">
+                        <div id="battle-feedback-icon" class="text-6xl mb-2">✅</div>
+                        <p id="battle-feedback-text" class="text-xl font-bold">Correct!</p>
+                        <p id="battle-feedback-points" class="text-lg text-gold font-medium">+150 points</p>
+                    </div>
+                    
+                    <!-- Answer Counter -->
+                    <div class="text-center text-ink-light/60 text-sm">
+                        <span id="battle-answers-count">0</span>/<span id="battle-players-total">0</span> players answered
+                    </div>
+                </div>
+                
+                <!-- Leaderboard View -->
+                <div id="battle-leaderboard" class="hidden space-y-6">
+                    <div class="text-center mb-8">
+                        <h2 class="text-3xl font-black text-purple-600 mb-2">🏆 Leaderboard</h2>
+                        <p class="text-ink-light/70">Question <span id="leaderboard-question-num">1</span> of <span id="leaderboard-total-questions">10</span></p>
+                    </div>
+                    
+                    <!-- Correct Answer Display -->
+                    <div class="p-4 rounded-xl bg-jade/20 border-2 border-jade text-center mb-6">
+                        <p class="text-sm text-jade font-medium">Correct Answer</p>
+                        <p id="leaderboard-correct-answer" class="text-3xl font-black text-ink" style="font-family: 'Noto Sans TC', sans-serif;">你好</p>
+                        <p id="leaderboard-correct-pinyin" class="text-lg text-jade">nǐ hǎo</p>
+                    </div>
+                    
+                    <!-- Top 5 Ranking -->
+                    <div id="leaderboard-rankings" class="space-y-3">
+                        <!-- Rankings will be added dynamically with animations -->
+                    </div>
+                </div>
+                
+                <!-- Final Results View -->
+                <div id="battle-final-results" class="hidden space-y-6">
+                    <div class="text-center">
+                        <div class="text-6xl mb-4">🎉</div>
+                        <h2 class="text-4xl font-black bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent mb-2">Battle Complete!</h2>
+                    </div>
+                    
+                    <!-- Winner Podium -->
+                    <div id="winner-podium" class="flex items-end justify-center gap-4 h-64 mb-8">
+                        <!-- 2nd Place -->
+                        <div class="podium-place w-24 text-center" data-place="2">
+                            <div class="text-4xl mb-2">🥈</div>
+                            <p id="podium-2nd-name" class="font-bold text-ink truncate">---</p>
+                            <p id="podium-2nd-score" class="text-sm text-ink-light/70">0 pts</p>
+                            <div class="h-24 bg-gradient-to-t from-gray-400 to-gray-300 rounded-t-lg mt-2"></div>
+                        </div>
+                        <!-- 1st Place -->
+                        <div class="podium-place w-28 text-center" data-place="1">
+                            <div class="text-5xl mb-2 animate-bounce">👑</div>
+                            <p id="podium-1st-name" class="font-bold text-xl text-ink truncate">---</p>
+                            <p id="podium-1st-score" class="text-sm text-gold">0 pts</p>
+                            <div class="h-32 bg-gradient-to-t from-gold to-yellow-300 rounded-t-lg mt-2"></div>
+                        </div>
+                        <!-- 3rd Place -->
+                        <div class="podium-place w-24 text-center" data-place="3">
+                            <div class="text-4xl mb-2">🥉</div>
+                            <p id="podium-3rd-name" class="font-bold text-ink truncate">---</p>
+                            <p id="podium-3rd-score" class="text-sm text-ink-light/70">0 pts</p>
+                            <div class="h-16 bg-gradient-to-t from-amber-700 to-amber-600 rounded-t-lg mt-2"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Full Results -->
+                    <div id="final-rankings" class="space-y-2">
+                        <!-- All player rankings -->
+                    </div>
+                    
+                    <div class="flex gap-4 mt-8">
+                        <button id="battle-play-again" class="flex-1 py-4 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold text-lg transition-all hover:scale-105">
+                            🔄 Play Again
+                        </button>
+                        <button id="battle-go-home" class="flex-1 py-4 rounded-xl bg-paper-aged border-2 border-paper-dark text-ink font-bold text-lg transition-all hover:bg-paper-dark">
+                            🏠 Home
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <!-- ==================== LESSONS SECTION ==================== -->
         <section id="lessons" class="section-page min-h-screen px-4 py-20 hidden">
             <div class="max-w-6xl mx-auto">
@@ -685,7 +908,13 @@
         <source src="https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3" type="audio/mpeg">
     </audio>
 
+    <!-- Socket.IO Client -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.min.js"></script>
+    
     <!-- Main Game Script -->
     <script src="{{ url_for('static', filename='js/game.js') }}"></script>
+    
+    <!-- Battle Mode Script -->
+    <script src="{{ url_for('static', filename='js/battle.js') }}"></script>
 </body>
 </html>

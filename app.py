@@ -277,13 +277,29 @@ def send_question(room_code):
     room['question_start_time'] = time.time()
     room['answered_players'] = set()
     
-    emit('new_question', {
+    socketio.emit('new_question', {
         'question_num': room['current_question'] + 1,
         'total_questions': len(room['questions']),
         'question': question['question'],
         'options': question['options'],
         'time_limit': 15
     }, room=room_code)
+
+def delayed_leaderboard(room_code):
+    """Show leaderboard after a short delay (runs in background task)."""
+    socketio.sleep(2)
+    show_leaderboard(room_code)
+
+def advance_to_next_question(room_code):
+    """Advance to next question after leaderboard (runs in background task)."""
+    socketio.sleep(5)
+    if room_code in battle_rooms:
+        room = battle_rooms[room_code]
+        room['current_question'] += 1
+        if room['current_question'] < len(room['questions']):
+            send_question(room_code)
+        else:
+            end_battle(room_code)
 
 @socketio.on('submit_answer')
 def handle_submit_answer(data):
@@ -339,6 +355,11 @@ def handle_submit_answer(data):
         'answered': len(room['answered_players']),
         'total': len(room['players'])
     }, room=room_code)
+    
+    # Check if all players have answered - auto show leaderboard
+    if len(room['answered_players']) >= len(room['players']):
+        # Small delay to let last player see their result
+        socketio.start_background_task(delayed_leaderboard, room_code)
 
 @socketio.on('time_up')
 def handle_time_up(data):
@@ -390,13 +411,16 @@ def show_leaderboard(room_code):
         'streak': p['streak']
     } for i, p in enumerate(sorted_players[:5])]
     
-    emit('show_leaderboard', {
+    socketio.emit('show_leaderboard', {
         'leaderboard': leaderboard,
         'question_num': room['current_question'] + 1,
         'total_questions': len(room['questions']),
         'correct_answer': question['correct'],
         'pinyin': question['pinyin']
     }, room=room_code)
+    
+    # Auto-advance to next question after 5 seconds
+    socketio.start_background_task(advance_to_next_question, room_code)
 
 @socketio.on('next_question')
 def handle_next_question(data):
@@ -435,7 +459,7 @@ def end_battle(room_code):
         'total_questions': len(room['questions'])
     } for i, p in enumerate(sorted_players)]
     
-    emit('battle_ended', {
+    socketio.emit('battle_ended', {
         'final_leaderboard': final_leaderboard,
         'winner': sorted_players[0]['name'] if sorted_players else 'No winner'
     }, room=room_code)

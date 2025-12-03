@@ -84,14 +84,14 @@ const battleDom = {
 
 // ==================== INITIALIZATION ====================
 function initBattle() {
-    // Connect to Socket.IO with polling transport for better compatibility
+    // Connect to Socket.IO with polling only (for Render free tier compatibility)
     battleState.socket = io({
-        transports: ['polling', 'websocket'],
-        upgrade: true,
+        transports: ['polling'],  // Only use polling, no websocket
+        upgrade: false,           // Don't try to upgrade to websocket
         reconnection: true,
-        reconnectionAttempts: 5,
+        reconnectionAttempts: 10,
         reconnectionDelay: 1000,
-        timeout: 20000
+        timeout: 30000
     });
     
     // Bind UI events
@@ -146,6 +146,28 @@ function bindBattleEvents() {
 
 function bindSocketEvents() {
     const socket = battleState.socket;
+    
+    // Connection events for debugging
+    socket.on('connect', () => {
+        console.log('✅ Socket connected! ID:', socket.id);
+        if (battleDom.errorMessage) {
+            battleDom.errorMessage.textContent = '';
+            battleDom.errorMessage.classList.add('hidden');
+        }
+    });
+    
+    socket.on('connect_error', (error) => {
+        console.error('❌ Socket connection error:', error);
+        showBattleError('Connection error. Please refresh and try again.');
+    });
+    
+    socket.on('disconnect', (reason) => {
+        console.log('🔌 Socket disconnected:', reason);
+        if (reason === 'io server disconnect') {
+            // Server disconnected us, try to reconnect
+            socket.connect();
+        }
+    });
     
     // Room created
     socket.on('room_created', (data) => {

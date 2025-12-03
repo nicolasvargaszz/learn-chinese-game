@@ -1,3 +1,7 @@
+# Eventlet monkey patching must come FIRST before any other imports
+import eventlet
+eventlet.monkey_patch()
+
 from flask import Flask, jsonify, render_template, request
 from flask_socketio import SocketIO, emit, join_room, leave_room
 import csv
@@ -9,15 +13,14 @@ import time
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'chinese-game-secret-key-2024')
 
-# Configure Socket.IO with eventlet async mode for production
+# Configure Socket.IO - use polling only for Render free tier compatibility
 socketio = SocketIO(
     app, 
     cors_allowed_origins="*",
     async_mode='eventlet',
-    ping_timeout=60,
+    ping_timeout=120,
     ping_interval=25,
-    logger=True,
-    engineio_logger=True
+    allow_upgrades=False  # Disable websocket upgrade, use polling only
 )
 
 def load_vocabulary_from_csv():

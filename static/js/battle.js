@@ -16,7 +16,8 @@ const battleState = {
     myStreak: 0,
     timerInterval: null,
     timeLeft: 15,
-    hasAnswered: false
+    hasAnswered: false,
+    timeUpSent: false  // Prevent duplicate time_up events
 };
 
 // ==================== DOM ELEMENTS ====================
@@ -329,6 +330,7 @@ function startCountdown(seconds) {
 
 function displayQuestion(data) {
     battleState.hasAnswered = false;
+    battleState.timeUpSent = false;  // Reset for new question
     battleState.currentQuestion = data.question_num;
     battleState.totalQuestions = data.total_questions;
     
@@ -455,7 +457,8 @@ function startQuestionTimer(seconds) {
         
         if (battleState.timeLeft <= 0) {
             stopTimer();
-            if (battleState.isHost) {
+            if (battleState.isHost && !battleState.timeUpSent) {
+                battleState.timeUpSent = true;
                 battleState.socket.emit('time_up', { room_code: battleState.roomCode });
             }
         }

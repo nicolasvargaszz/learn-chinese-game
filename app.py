@@ -154,7 +154,9 @@ def handle_create_room(data):
         'questions': [],
         'start_time': None,
         'question_start_time': None,
-        'answered_players': set()
+        'answered_players': set(),
+        'leaderboard_shown': False,  # Prevent duplicate leaderboard
+        'advancing': False  # Prevent duplicate question advances
     }
     
     player_id = f"player_1"
@@ -289,6 +291,9 @@ def send_question(room_code):
     question = room['questions'][room['current_question']]
     room['question_start_time'] = time.time()
     room['answered_players'] = set()
+    room['leaderboard_shown'] = False  # Reset for new question
+    room['leaderboard_displayed'] = False  # Reset for new question
+    room['advancing'] = False  # Reset for new question
     
     socketio.emit('new_question', {
         'question_num': room['current_question'] + 1,
@@ -301,18 +306,22 @@ def send_question(room_code):
 def delayed_leaderboard(room_code):
     """Show leaderboard after a short delay (runs in background task)."""
     socketio.sleep(2)
-    show_leaderboard(room_code)
+    if room_code in battle_rooms:
+        show_leaderboard(room_code)
 
 def advance_to_next_question(room_code):
     """Advance to next question after leaderboard (runs in background task)."""
     socketio.sleep(5)
     if room_code in battle_rooms:
         room = battle_rooms[room_code]
-        room['current_question'] += 1
-        if room['current_question'] < len(room['questions']):
-            send_question(room_code)
-        else:
-            end_battle(room_code)
+        # Only advance if not already advancing
+        if not room.get('advancing', False):
+            room['advancing'] = True
+            room['current_question'] += 1
+            if room['current_question'] < len(room['questions']):
+                send_question(room_code)
+            else:
+                end_battle(room_code)
 
 @socketio.on('submit_answer')
 def handle_submit_answer(data):
@@ -364,15 +373,17 @@ def handle_submit_answer(data):
     })
     
     # Notify all about answer count
-    emit('answer_count', {
+    socketio.emit('answer_count', {
         'answered': len(room['answered_players']),
         'total': len(room['players'])
     }, room=room_code)
     
     # Check if all players have answered - auto show leaderboard
     if len(room['answered_players']) >= len(room['players']):
-        # Small delay to let last player see their result
-        socketio.start_background_task(delayed_leaderboard, room_code)
+        # Only trigger if leaderboard not already shown/scheduled
+        if not room.get('leaderboard_shown', False):
+            room['leaderboard_shown'] = True  # Mark as scheduled
+            socketio.start_background_task(delayed_leaderboard, room_code)
 
 @socketio.on('time_up')
 def handle_time_up(data):
@@ -384,8 +395,14 @@ def handle_time_up(data):
     
     room = battle_rooms[room_code]
     
+    # Only host can trigger time_up, and only if leaderboard not shown
     if room['host_sid'] != request.sid:
         return
+    
+    if room.get('leaderboard_shown', False):
+        return  # Already showing leaderboard
+    
+    room['leaderboard_shown'] = True  # Mark as scheduled
     
     # Mark unanswered players as wrong
     for player_id, player in room['players'].items():
@@ -406,7 +423,10 @@ def handle_show_leaderboard(data):
     if room['host_sid'] != request.sid:
         return
     
-    show_leaderboard(room_code)
+    # Only show if not already shown
+    if not room.get('leaderboard_shown', False):
+        room['leaderboard_shown'] = True
+        show_leaderboard(room_code)
 
 def show_leaderboard(room_code):
     """Show leaderboard after each question."""
@@ -414,6 +434,12 @@ def show_leaderboard(room_code):
         return
     
     room = battle_rooms[room_code]
+    
+    # Prevent showing leaderboard multiple times for same question
+    if room.get('leaderboard_displayed', False):
+        return
+    room['leaderboard_displayed'] = True
+    
     question = room['questions'][room['current_question']]
     
     sorted_players = sorted(room['players'].values(), key=lambda p: p['score'], reverse=True)
@@ -437,23 +463,9 @@ def show_leaderboard(room_code):
 
 @socketio.on('next_question')
 def handle_next_question(data):
-    """Move to next question."""
-    room_code = data.get('room_code')
-    
-    if room_code not in battle_rooms:
-        return
-    
-    room = battle_rooms[room_code]
-    
-    if room['host_sid'] != request.sid:
-        return
-    
-    room['current_question'] += 1
-    
-    if room['current_question'] < len(room['questions']):
-        send_question(room_code)
-    else:
-        end_battle(room_code)
+    """Move to next question (manual trigger - disabled to prevent skipping)."""
+    # Disabled - questions now auto-advance
+    pass
 
 def end_battle(room_code):
     """End the battle and show final results."""

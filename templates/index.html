@@ -77,6 +77,7 @@
                 <div class="hidden md:flex items-center gap-8">
                     <a href="#" data-nav="home" class="nav-link text-vermillion hover:text-cinnabar transition-colors font-semibold">🏠 Home</a>
                     <a href="#" data-nav="flashcards" class="nav-link text-vermillion hover:text-cinnabar transition-colors font-semibold">🃏 Flashcards</a>
+                    <a href="#" data-nav="writing" class="nav-link text-vermillion hover:text-cinnabar transition-colors font-semibold">✍️ Writing</a>
                     <a href="#" data-nav="lessons" class="nav-link text-vermillion hover:text-cinnabar transition-colors font-semibold">📖 Lessons</a>
                 </div>
                 <div class="flex items-center gap-4">
@@ -98,21 +99,6 @@
         <section id="home" class="section-page min-h-screen flex items-center justify-center px-4 py-20">
             <div class="max-w-6xl mx-auto text-center">
                 
-                <!-- Important Notice Banner -->
-                <div class="mb-10 p-6 rounded-2xl bg-gradient-to-r from-vermillion/20 via-gold/20 to-vermillion/20 border-4 border-vermillion shadow-2xl shadow-vermillion/20 animate-pulse-slow">
-                    <div class="flex items-center justify-center gap-3 mb-3">
-                        <span class="text-4xl">⚠️</span>
-                        <h2 class="text-2xl md:text-3xl font-black text-vermillion">Important Notice</h2>
-                        <span class="text-4xl">⚠️</span>
-                    </div>
-                    <p class="text-lg md:text-xl text-ink font-semibold leading-relaxed max-w-4xl mx-auto">
-                        "This game was <span class="text-vermillion font-black">100% developed by Nicolás Vargas</span>. Not a single other group member contributed to this project. This message is here to kindly ask the professor to take this into consideration at the time of grading the project. Even though it is not the best, it was developed only by one group member."
-                    </p>
-                    <div class="mt-4 flex justify-center gap-2">
-                        <span class="px-3 py-1 rounded-full bg-vermillion/20 text-vermillion text-sm font-bold">Solo Developer</span>
-                        <span class="px-3 py-1 rounded-full bg-gold/20 text-gold text-sm font-bold">100% Original Work</span>
-                    </div>
-                </div>
                 
                 <div class="mb-8 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-vermillion/10 border border-vermillion/30 text-vermillion text-sm font-medium">
                     <span class="animate-pulse">✨</span>
@@ -156,6 +142,11 @@
                         <div class="text-4xl mb-4">🎯🏮</div>
                         <h3 class="text-xl font-bold mb-2 text-ink">Quiz Mode</h3>
                         <p class="text-ink-light/70 text-sm">Test your knowledge with timed multiple choice questions.</p>
+                    </div>
+                    <div class="study-mode-card p-6 rounded-2xl bg-paper-warm border-2 border-paper-dark backdrop-blur-sm hover:border-jade/50 transition-all cursor-pointer" data-mode="writing">
+                        <div class="text-4xl mb-4">✍️🀄</div>
+                        <h3 class="text-xl font-bold mb-2 text-ink">Writing Practice</h3>
+                        <p class="text-ink-light/70 text-sm">Select any word and practice writing it.</p>
                     </div>
                     <div class="study-mode-card p-6 rounded-2xl bg-paper-warm border-2 border-paper-dark backdrop-blur-sm hover:border-gold/50 transition-all cursor-pointer" data-mode="lessons">
                         <div class="text-4xl mb-4">📖🎋</div>
@@ -323,6 +314,78 @@
                 </div>
             </div>
         </section>
+
+
+        <!-- ==================== WRITING SECTION ==================== -->
+        <section id="writing" class="section-page min-h-screen px-4 py-20 hidden">
+            <div class="max-w-4xl mx-auto">
+                <!-- Header -->
+                <div class="flex flex-col sm:flex-row items-center justify-between gap-4 mb-8">
+                    <div class="flex items-center gap-4">
+                        <button id="writing-back-to-home" class="p-2 rounded-lg bg-paper-aged hover:bg-paper-dark transition-colors border border-paper-dark">
+                            <svg class="w-6 h-6 text-ink" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                            </svg>
+                        </button>
+                        <h2 class="text-2xl font-bold text-ink">✍️ Writing Practice</h2>
+                    </div>
+                </div>
+
+                <!-- Selector -->
+                <div class="mb-6 flex flex-col sm:flex-row items-center justify-center gap-3">
+                    <label for="wr-word-select" class="text-sm text-ink-light/70">Choose a word to practice:</label>
+                    <select id="wr-word-select" class="px-4 py-2 rounded-xl bg-paper-warm border-2 border-paper-dark outline-none cursor-pointer">
+                        <option value="">Loading...</option>
+                    </select>
+                </div>
+
+                <!-- Current Word Info -->
+                <div class="mb-8 text-center">
+                    <div id="wr-lesson" class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-vermillion/10 text-vermillion text-sm font-medium border border-vermillion/30 mb-3">
+                        Lesson
+                    </div>
+                    <div id="wr-chinese" class="font-chinese text-7xl md:text-8xl font-black text-ink mb-4 chinese-glow">
+                        字
+                    </div>
+                    <div id="wr-pinyin" class="text-2xl text-jade font-semibold mb-1">
+                        pīnyīn
+                    </div>
+                    <div id="wr-english" class="text-xl text-ink-light mb-2">
+                        English meaning
+                    </div>
+                    <div id="wr-hint" class="text-sm text-ink-light/70">
+                        Hint or category
+                    </div>
+                </div>
+
+                <!-- Canvas -->
+                <div class="mt-6 text-center">
+                    <h3 class="text-lg font-semibold text-ink mb-3">Draw the character in the box</h3>
+
+                    <canvas id="write-canvas" width="300" height="300"
+                        class="border-4 border-paper-dark bg-paper-warm rounded-xl mx-auto shadow-lg cursor-crosshair">
+                    </canvas>
+
+                    <div class="flex justify-center gap-4 mt-4">
+                        <button id="clear-canvas"
+                            class="px-4 py-2 bg-paper-aged border-2 border-paper-dark rounded-xl hover:bg-paper-dark">
+                            🧼 Clear
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Navigation -->
+                <div class="flex items-center justify-center gap-4 mt-8">
+                    <button id="wr-prev" class="p-3 rounded-2xl bg-paper-aged hover:bg-paper-dark transition-all border-2 border-paper-dark">
+                        ← Previous
+                    </button>
+                    <button id="wr-next" class="p-3 rounded-2xl bg-paper-aged hover:bg-paper-dark transition-all border-2 border-paper-dark">
+                        Next →
+                    </button>
+                </div>
+            </div>
+        </section>
+
 
         <!-- ==================== QUIZ SECTION ==================== -->
         <section id="quiz" class="section-page min-h-screen px-4 py-20 hidden">
